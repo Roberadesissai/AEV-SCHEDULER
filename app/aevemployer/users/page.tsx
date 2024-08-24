@@ -1,35 +1,34 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import EmployerLayout from '@/layouts/EmployerLayout';
-import { UserPlus, XCircle, User, Mail, Key, ChevronDown, Edit3, Trash2 } from "lucide-react";
-import { v4 as uuidv4 } from 'uuid';
+import { UserPlus, Edit3, Trash2 } from "lucide-react";
+import axios from 'axios';
 
 export default function Users() {
   const [employees, setEmployees] = useState([]);
-  const [activeTab, setActiveTab] = useState('view');
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [activeTab, setActiveTab] = useState('view'); // Ensure this line is correctly defined
 
-  const handleAddEmployee = () => {
-    const password = generatePassword(firstName, lastName);
-    const newEmployee = {
-      id: uuidv4(),
-      firstName,
-      lastName,
-      email,
-      password,
-    };
-    setEmployees([...employees, newEmployee]);
-    setFirstName("");
-    setLastName("");
-    setEmail("");
-    setActiveTab('view');
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  const fetchEmployees = async () => {
+    const response = await axios.get('/api/employees');
+    setEmployees(response.data);
   };
 
-  const generatePassword = (firstName, lastName) => {
-    return `${firstName.slice(0, 3)}${lastName.slice(0, 3)}${Math.floor(Math.random() * 1000)}`;
+  const handleAddEmployee = async () => {
+    await axios.post('/api/employees', { firstName, lastName, email, password });
+    fetchEmployees(); // Refresh the list
+    setFirstName('');
+    setLastName('');
+    setEmail('');
+    setPassword('');
   };
 
   return (
@@ -37,8 +36,8 @@ export default function Users() {
       <main className="min-h-screen p-8 bg-gray-50 dark:bg-gray-900">
         {/* Welcome Banner */}
         <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-6 rounded-lg mb-6 text-white">
-        <h1 className="text-3xl font-bold">Manage Employees</h1>
-        <p>Here you can view and manage your employees.</p>
+          <h1 className="text-3xl font-bold">Manage Employees</h1>
+          <p>Here you can view and manage your employees.</p>
         </div>
 
         {/* Navigation Tabs */}

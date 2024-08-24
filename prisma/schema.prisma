@@ -1,0 +1,18 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "postgresql" // Or another database (mysql, sqlite, etc.)
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Employee {
+  id        Int     @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String  @unique
+  password  String
+}
